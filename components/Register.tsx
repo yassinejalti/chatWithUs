@@ -2,7 +2,13 @@ import { View, Text, TouchableOpacity, StyleSheet, TextInput, Image, Alert } fro
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Picker } from '@react-native-picker/picker';
-import { useWebSocket } from '../contexts/webSocketContext';
+
+// websocket context
+import { useWebSocket } from '../contexts/WebSocketContext';
+
+// store
+import { useSelector, useDispatch } from 'react-redux';
+import { connect } from '../store/reducer';
 
 export default function Register() {
     const navigation = useNavigation<any>();
@@ -10,17 +16,20 @@ export default function Register() {
     const [age, setAge] = useState(18);
     const [gender, setGender] = useState('male');
     const [description, setDescription] = useState('');
-    const { ws, message, sendMessage } = useWebSocket();
+    const { ws } = useWebSocket();
+
 
     const handleRegister = () => {
+        const currentState = useSelector((state:any) => state.general).general;
+        const dispatch = useDispatch();
+
         if (name === '') {
             Alert.alert('Empty Field', 'Name is required', [{ text: 'I understand' }]);
             return;
         }
-
-        //
-
-        return;
+        const client = {name:name, age:age, gender:gender, description:description};
+        currentState.client = client;        
+        ws.send(JSON.stringify(currentState));
         navigation.navigate('Users');
     };
 

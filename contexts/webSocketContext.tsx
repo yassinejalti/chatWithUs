@@ -1,18 +1,12 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
+
+// store properties
+import { useSelector, useDispatch } from 'react-redux';
+import { connect, load_msg, open } from '../store/reducer';
 
 const defaultWebSocketContext = {
     ws: null,
-    message: [],
-    sendMessage: (message: any) => {},
 };
-
-// {name:'', age:'', gender:'', description:''}
-const initialClient = {
-    internal_client_ID:null,
-    client: null,
-    conversations: [],
-};
-
 
 const WebSocketContext = createContext<any>(defaultWebSocketContext);
 
@@ -22,20 +16,39 @@ export const useWebSocket = () => {
 
 export const WebSocketProvider = ({ children }:any) => {
     const [ws, setWs] = useState<WebSocket>();
-    const [message, setMessage] = useState<any[]>([]);
-    // const [lastUpdate, setLastUpdate] = useState<any[]>([]);
+    const initialState = useSelector((state:any) => state.general).general;    
+    const initialStateRef = useRef(initialState);
+    const dispatch = useDispatch();
 
     useEffect(() => {
+        initialStateRef.current = initialState;
+    }, [initialState]);
+
+    useEffect(() => {        
         const websocket = new WebSocket('wss://robust-deluxe-pansy.glitch.me');
   
         websocket.onopen = () => {
             console.log('Connected to WebSocket server');
-            websocket.send(JSON.stringify(initialClient));
+            websocket.send(JSON.stringify(initialState));
         };
   
         websocket.onmessage = (event) => {
-            const receivedMessage = (event.data);
-            // setLastUpdate(JSON.parse(receivedMessage));
+            const receivedMessage = JSON.parse(event.data);
+            const latestInitialStateRef = initialStateRef.current;
+
+            if(receivedMessage.client == null && receivedMessage.internal_client_ID != null){
+                dispatch(open(receivedMessage));
+                
+            }
+            else if(receivedMessage.client != null && receivedMessage.internal_client_ID != null && (receivedMessage.conversations == latestInitialStateRef.conversations)){
+                dispatch(connect(receivedMessage));
+
+            }
+            else{
+                dispatch(load_msg(receivedMessage));
+
+            }
+
         };
   
         websocket.onclose = () => {
@@ -50,14 +63,8 @@ export const WebSocketProvider = ({ children }:any) => {
         };
     }, []);
 
-    const sendMessage = (message:any) => {
-        if (ws) {
-            ws.send(JSON.stringify({ message }));
-        }
-    };
-
     return (
-        <WebSocketContext.Provider value={{ ws, message, sendMessage }}>
+         <WebSocketContext.Provider value={{ ws }}>
             {children}
         </WebSocketContext.Provider>
     );

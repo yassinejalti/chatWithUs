@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from "react-native";
 import { useLayoutEffect } from 'react';
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { useWebSocket } from '../contexts/webSocketContext';
+import { useWebSocket } from '../contexts/WebSocketContext';
 
 interface RouteParams {
     name: string;
@@ -9,9 +9,6 @@ interface RouteParams {
     gender:string,
     description: string;
 }
-
-// websocket propreties
-// const { ws, messages, sendMessage, lastUpdate } = useWebSocket();
 
 // example list
 const usersEx = [
@@ -80,6 +77,7 @@ export default function Users() {
     const navigation = useNavigation();
     const route = useRoute();
     const { name, age, gender, description } = route.params as RouteParams;
+    const { ws } = useWebSocket();
 
     const logout = () => {
         Alert.alert(

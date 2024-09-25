@@ -2,6 +2,9 @@ import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useLayoutEffect, useState, useRef } from 'react';
 
+// websocket context
+import { useWebSocket } from '../contexts/WebSocketContext';
+
 interface RouteParams {
     id:number,
     name: string;
@@ -40,6 +43,7 @@ function Message({ isReceived, datetime, content }:any) {
 export default function Chat(){
     const navigation = useNavigation<any>();
     const scrollViewRef = useRef<ScrollView>(null);
+    const { ws } = useWebSocket();
 
     const route = useRoute();
     const [inputText, setInputText] = useState('');
