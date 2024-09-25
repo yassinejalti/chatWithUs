@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from "react-native";
 import { useLayoutEffect } from 'react';
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { useWebSocket } from '../contexts/webSocketContext';
 
 interface RouteParams {
     name: string;
@@ -8,6 +9,9 @@ interface RouteParams {
     gender:string,
     description: string;
 }
+
+// websocket propreties
+// const { ws, messages, sendMessage, lastUpdate } = useWebSocket();
 
 // example list
 const usersEx = [

@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet, TextInput, Image, Alert } fro
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Picker } from '@react-native-picker/picker';
+import { useWebSocket } from '../contexts/webSocketContext';
 
 export default function Register() {
     const navigation = useNavigation<any>();
@@ -9,6 +10,7 @@ export default function Register() {
     const [age, setAge] = useState(18);
     const [gender, setGender] = useState('male');
     const [description, setDescription] = useState('');
+    const { ws, message, sendMessage } = useWebSocket();
 
     const handleRegister = () => {
         if (name === '') {
@@ -16,12 +18,10 @@ export default function Register() {
             return;
         }
 
-        navigation.navigate('Users', {
-            name,
-            age,
-            gender,
-            description,
-        });
+        //
+
+        return;
+        navigation.navigate('Users');
     };
 
     return (
