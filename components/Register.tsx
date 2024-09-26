@@ -4,12 +4,18 @@ import { useNavigation } from "@react-navigation/native";
 import { Picker } from '@react-native-picker/picker';
 
 // websocket context
-import { useWebSocket } from '../contexts/WebSocketContext';
+import { useWebSocket } from '../contexts/webSocketContext';
 
 // store
-import { useSelector, useDispatch } from 'react-redux';
-import { connect } from '../store/reducer';
+import { useSelector } from 'react-redux';
 
+interface Client {
+    name: string;
+    age: number;
+    gender: string;
+    description: string;
+}
+  
 export default function Register() {
     const navigation = useNavigation<any>();
     const [name, setName] = useState('');
@@ -17,18 +23,18 @@ export default function Register() {
     const [gender, setGender] = useState('male');
     const [description, setDescription] = useState('');
     const { ws } = useWebSocket();
-
+    let currentState = useSelector((state:any)=>state.general).general;
+    currentState = JSON.stringify(currentState);
+    currentState = JSON.parse(currentState);
 
     const handleRegister = () => {
-        const currentState = useSelector((state:any) => state.general).general;
-        const dispatch = useDispatch();
-
         if (name === '') {
             Alert.alert('Empty Field', 'Name is required', [{ text: 'I understand' }]);
             return;
         }
-        const client = {name:name, age:age, gender:gender, description:description};
-        currentState.client = client;        
+        const client:Client = {name:name, age:age, gender:gender, description:description};
+        currentState.client = client;
+
         ws.send(JSON.stringify(currentState));
         navigation.navigate('Users');
     };

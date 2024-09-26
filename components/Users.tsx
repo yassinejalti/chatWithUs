@@ -1,14 +1,10 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from "react-native";
 import { useLayoutEffect } from 'react';
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { useWebSocket } from '../contexts/WebSocketContext';
+import { useNavigation  } from "@react-navigation/native";
+import { useWebSocket } from '../contexts/webSocketContext';
 
-interface RouteParams {
-    name: string;
-    age: number;
-    gender:string,
-    description: string;
-}
+// store
+import { useSelector } from 'react-redux';
 
 // example list
 const usersEx = [
@@ -74,11 +70,12 @@ function MiniUser({ user }:any) {
 };
  
 export default function Users() {
-    const navigation = useNavigation();
-    const route = useRoute();
-    const { name, age, gender, description } = route.params as RouteParams;
+    const navigation = useNavigation<any>();
     const { ws } = useWebSocket();
-
+    let currentState = useSelector((state:any)=>state.general).general;
+    currentState = JSON.stringify(currentState);
+    currentState = JSON.parse(currentState);
+    
     const logout = () => {
         Alert.alert(
             'Your account will be deleted',
@@ -120,7 +117,7 @@ export default function Users() {
     return (
         <ScrollView>
             <View style={{ padding: 10 }}>
-                <MiniUser key={-1} user={{ name, age, gender, description, self:true }} />
+                {/* <MiniUser key={-1} user={{ name, age, gender, description, self:true }} /> */}
                 {usersEx.map(user => (
                     <MiniUser key={user.id} user={user} />
                 ))}

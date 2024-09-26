@@ -1,17 +1,12 @@
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { useLayoutEffect, useState, useRef } from 'react';
 
 // websocket context
-import { useWebSocket } from '../contexts/WebSocketContext';
+import { useWebSocket } from '../contexts/webSocketContext';
 
-interface RouteParams {
-    id:number,
-    name: string;
-    age: number;
-    gender:string,
-    description: string;
-}
+// store
+import { useSelector } from 'react-redux';
 
 const messages = [
     {
@@ -44,14 +39,14 @@ export default function Chat(){
     const navigation = useNavigation<any>();
     const scrollViewRef = useRef<ScrollView>(null);
     const { ws } = useWebSocket();
-
-    const route = useRoute();
     const [inputText, setInputText] = useState('');
-    const { id, name, age, gender, description } = route.params as RouteParams;
+    let currentState = useSelector((state:any)=>state.general).general;
+    currentState = JSON.stringify(currentState);
+    currentState = JSON.parse(currentState);
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: 'Chat with '+name,
+            title: 'Chat with ',
         });
     }, [navigation]);
 

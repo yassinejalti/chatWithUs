@@ -1,8 +1,9 @@
-import { createContext, useContext, useEffect, useState, useRef } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 // store properties
 import { useSelector, useDispatch } from 'react-redux';
 import { connect, load_msg, open } from '../store/reducer';
+
 
 const defaultWebSocketContext = {
     ws: null,
@@ -17,35 +18,33 @@ export const useWebSocket = () => {
 export const WebSocketProvider = ({ children }:any) => {
     const [ws, setWs] = useState<WebSocket>();
     const initialState = useSelector((state:any) => state.general).general;    
-    const initialStateRef = useRef(initialState);
     const dispatch = useDispatch();
-
+    
     useEffect(() => {
-        initialStateRef.current = initialState;
-    }, [initialState]);
-
-    useEffect(() => {        
         const websocket = new WebSocket('wss://robust-deluxe-pansy.glitch.me');
-  
+
         websocket.onopen = () => {
             console.log('Connected to WebSocket server');
-            websocket.send(JSON.stringify(initialState));
+            if (websocket.readyState === WebSocket.OPEN) {
+                websocket.send(JSON.stringify(initialState));
+            }
         };
   
         websocket.onmessage = (event) => {
             const receivedMessage = JSON.parse(event.data);
-            const latestInitialStateRef = initialStateRef.current;
-
+            
             if(receivedMessage.client == null && receivedMessage.internal_client_ID != null){
                 dispatch(open(receivedMessage));
                 
             }
-            else if(receivedMessage.client != null && receivedMessage.internal_client_ID != null && (receivedMessage.conversations == latestInitialStateRef.conversations)){
-                dispatch(connect(receivedMessage));
-
-            }
-            else{
-                dispatch(load_msg(receivedMessage));
+            else if(receivedMessage.client !== null && receivedMessage.internal_client_ID !== null && receivedMessage.connected){
+                const { connected, ...CorrectStructer } = receivedMessage;
+                dispatch(connect(CorrectStructer));
+        
+            } 
+            else if(receivedMessage.client !== null && receivedMessage.internal_client_ID !== null && receivedMessage.loaded_info){
+                const { loaded_info, ...CorrectStructer } = receivedMessage;
+                dispatch(load_msg(CorrectStructer));
 
             }
 
@@ -59,7 +58,9 @@ export const WebSocketProvider = ({ children }:any) => {
   
         // Cleanup on component unmount
         return () => {
-            websocket.close();
+            if (websocket.readyState === WebSocket.OPEN || websocket.readyState === WebSocket.CONNECTING) {
+                websocket.close();
+            }
         };
     }, []);
 
