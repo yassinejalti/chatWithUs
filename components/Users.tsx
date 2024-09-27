@@ -1,26 +1,10 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, Button } from "react-native";
 import { useLayoutEffect } from 'react';
 import { useNavigation  } from "@react-navigation/native";
 import { useWebSocket } from '../contexts/webSocketContext';
 
 // store
 import { useSelector } from 'react-redux';
-
-// example list
-const usersEx = [
-    { id: 133, name: 'Yassine', age: 20, gender: 'male', description: 'Hi' },
-    { id: 134, name: 'Amina', age: 25, gender: 'female', description: 'Hello' },
-    { id: 135, name: 'John', age: 22, gender: 'male', description: 'Hey there' },
-    { id: 136, name: 'Yassine', age: 20, gender: 'male', description: 'Hi' },
-    { id: 137, name: 'Amina', age: 25, gender: 'female', description: 'Hello' },
-    { id: 138, name: 'John', age: 22, gender: 'male', description: 'Hey there' },
-    { id: 139, name: 'Yassine', age: 20, gender: 'male', description: 'Hi' },
-    { id: 140, name: 'Amina', age: 25, gender: 'female', description: 'Hello' },
-    { id: 141, name: 'John', age: 22, gender: 'male', description: 'Hey there' },
-    { id: 142, name: 'Yassine', age: 20, gender: 'male', description: 'Hi' },
-    { id: 143, name: 'Amina', age: 25, gender: 'female', description: 'Hello' },
-    { id: 144, name: 'John', age: 22, gender: 'male', description: 'Hey there' },
-]
 
 function MiniUser({ user }:any) {
     const navigation = useNavigation<any>();
@@ -60,11 +44,11 @@ function MiniUser({ user }:any) {
                 <Text style={styles.age}>{user.age} years old</Text>
                 <Text style={styles.description}>{user.description}</Text>
             </View>
-            {(isDisabled)? 
+            {isDisabled ? 
                 <TouchableOpacity>
                     <Image source={require('../assets/img/settings.png')} style={styles.online} />
                 </TouchableOpacity>
-                :<Image source={require('../assets/img/online.png')} style={styles.online} />}
+                : <Image source={require('../assets/img/online.png')} style={styles.online} />}
         </TouchableOpacity>
     );
 };
@@ -72,7 +56,7 @@ function MiniUser({ user }:any) {
 export default function Users() {
     const navigation = useNavigation<any>();
     const { ws } = useWebSocket();
-    let currentState = useSelector((state:any)=>state.general).general;
+    let currentState = useSelector((state:any)=>state.general);
     currentState = JSON.stringify(currentState);
     currentState = JSON.parse(currentState);
     
@@ -116,12 +100,12 @@ export default function Users() {
 
     return (
         <ScrollView>
-            <View style={{ padding: 10 }}>
-                {/* <MiniUser key={-1} user={{ name, age, gender, description, self:true }} /> */}
-                {usersEx.map(user => (
-                    <MiniUser key={user.id} user={user} />
-                ))}
-            </View>
+        <View style={{ padding: 10 }}>
+            <MiniUser key={-1} user={{ ...(currentState.general).client, self: true }} />
+            {((currentState.general).conversations).map((conversation:any, index:Number) => (
+                <MiniUser key={index} user={conversation.client} />
+            ))}
+        </View>
         </ScrollView>
     );
 }

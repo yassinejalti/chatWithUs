@@ -11,15 +11,16 @@ const generalSlice = createSlice({
     open: (state, action) => {
       state.general.internal_client_ID = (action.payload).internal_client_ID;
     },
-    connect: (state, action) => {
+    fresh: (state, action) => {
       state.general.client = (action.payload).client;
+      state.general.conversations = (action.payload).conversations;
     },
-    load_msg: (state, action) => {
+    fresh_msg: (state, action) => {
       state.general.conversations = (action.payload).conversations;
     },
   },
 });
 
-export const { connect, load_msg, open } = generalSlice.actions;
+export const { fresh, open, fresh_msg } = generalSlice.actions;
 
 export default generalSlice.reducer;

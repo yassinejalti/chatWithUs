@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 
 // store properties
 import { useSelector, useDispatch } from 'react-redux';
-import { connect, load_msg, open } from '../store/reducer';
+import { fresh, fresh_msg, open } from '../store/reducer';
 
 
 const defaultWebSocketContext = {
@@ -37,17 +37,18 @@ export const WebSocketProvider = ({ children }:any) => {
                 dispatch(open(receivedMessage));
                 
             }
-            else if(receivedMessage.client !== null && receivedMessage.internal_client_ID !== null && receivedMessage.connected){
-                const { connected, ...CorrectStructer } = receivedMessage;
-                dispatch(connect(CorrectStructer));
+            else if(receivedMessage.client !== null && receivedMessage.internal_client_ID !== null && receivedMessage.refresh_msg){
+                console.log('recieved');
+                const { refresh_msg, ...CorrectStructer } = receivedMessage;
+                console.log(CorrectStructer);
+                dispatch(fresh_msg(CorrectStructer));
         
-            } 
-            else if(receivedMessage.client !== null && receivedMessage.internal_client_ID !== null && receivedMessage.loaded_info){
-                const { loaded_info, ...CorrectStructer } = receivedMessage;
-                dispatch(load_msg(CorrectStructer));
-
             }
-
+            else if(receivedMessage.client !== null && receivedMessage.internal_client_ID !== null && receivedMessage.refresh){
+                const { refresh, ...CorrectStructer } = receivedMessage;
+                dispatch(fresh(CorrectStructer));
+        
+            }
         };
   
         websocket.onclose = () => {
