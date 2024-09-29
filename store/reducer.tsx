@@ -18,9 +18,14 @@ const generalSlice = createSlice({
     fresh_msg: (state, action) => {
       state.general.conversations = (action.payload).conversations;
     },
+    close: (state) => {
+      state.general.internal_client_ID = null;
+      state.general.client = null;
+      state.general.conversations = [];
+    },
   },
 });
 
-export const { fresh, open, fresh_msg } = generalSlice.actions;
+export const { fresh, open, fresh_msg, close } = generalSlice.actions;
 
 export default generalSlice.reducer;

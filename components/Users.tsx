@@ -6,7 +6,7 @@ import { useWebSocket } from '../contexts/webSocketContext';
 // store
 import { useSelector } from 'react-redux';
 
-function MiniUser({ user }:any) {
+function MiniUser({ user,id }:any) {
     const navigation = useNavigation<any>();
     let isDisabled;
     if(user.self){
@@ -15,9 +15,9 @@ function MiniUser({ user }:any) {
         isDisabled = false;
     }
 
-    const openChat = (user:any) => {
+    const openChat = (user:any,id:string) => {
         navigation.navigate('Chat', {
-            id:user.id,
+            internal_client_ID:id,
             name:user.name,
             age:user.age,
             gender:user.gender,
@@ -31,7 +31,7 @@ function MiniUser({ user }:any) {
             disabled={isDisabled}
             onPress={() => {
                 if (!isDisabled) {
-                    openChat(user);
+                    openChat(user,id);
                 }
             }}
         >
@@ -73,9 +73,8 @@ export default function Users() {
                 {
                     text: 'Continue',
                     onPress: () => {
-                        console.log('Continue Pressed');
-                        //
-                        //
+                        ws.close();
+                        navigation.navigate('Register');
                     },
                     style: 'default',
                 },
@@ -103,7 +102,7 @@ export default function Users() {
         <View style={{ padding: 10 }}>
             <MiniUser key={-1} user={{ ...(currentState.general).client, self: true }} />
             {((currentState.general).conversations).map((conversation:any, index:Number) => (
-                <MiniUser key={index} user={conversation.client} />
+                <MiniUser key={index} user={conversation.client} id={conversation.internal_client_ID} />
             ))}
         </View>
         </ScrollView>

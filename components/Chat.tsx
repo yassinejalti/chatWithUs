@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useLayoutEffect, useState, useRef } from 'react';
 
 // websocket context
@@ -44,9 +44,13 @@ export default function Chat(){
     currentState = JSON.stringify(currentState);
     currentState = JSON.parse(currentState);
 
+    // route params
+    const route = useRoute<any>();
+    const { internal_client_ID, name, age, gender, description } = route.params;
+
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: 'Chat with ',
+            title: 'Chat with '+name,
         });
     }, [navigation]);
 
